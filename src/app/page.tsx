@@ -1,6 +1,6 @@
 import Image from "next/image";
 import signIn from "../@assets/oldsignIn.png";
-import LogIn from "@/components/module/logIn/page";
+import LogIn from "@/src/components/module/logIn/page";
 
 export default function Home() {
   return (

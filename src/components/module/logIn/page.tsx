@@ -1,6 +1,6 @@
 "use client";
-import Button from "@/components/core/Button/Button";
-import Input from "@/components/core/Input/Input";
+import Button from "@/src/components/core/Button/Button";
+import Input from "@/src/components/core/Input/Input";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -19,15 +19,11 @@ const schema = yup.object({
 });
 
 export default function LogIn() {
-    const router = useRouter()
+const router = useRouter()
   const {
     handleSubmit,
     register,
     formState: { errors },
-    setValue,
-    watch,
-    reset,
-    setError,
   } = useForm<any>({
     resolver: yupResolver(schema),
   });
