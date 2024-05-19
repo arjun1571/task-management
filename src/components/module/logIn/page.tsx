@@ -4,7 +4,7 @@ import Input from "@/src/components/core/Input/Input";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 
 const schema = yup.object({
   email: yup
@@ -15,11 +15,14 @@ const schema = yup.object({
     .email("Invalid Email format")
     .max(100, "Work Email must not exceed 100 digits")
     .matches(/^\S*$/, "Spaces are not allowed in the email"),
-  password: yup.string().required("Password is required").min(6,"Password minimum length 6 character"),
+  password: yup
+    .string()
+    .required("Password is required")
+    .min(6, "Password minimum length 6 character"),
 });
 
 export default function LogIn() {
-const router = useRouter()
+  const router = useRouter();
   const {
     handleSubmit,
     register,
@@ -30,8 +33,8 @@ const router = useRouter()
 
   const formSubmit = (data: any) => {
     console.log(data);
-    if(data){
-        router.push('/dashboard', { scroll: false })
+    if (data) {
+      router.push("/project-overview", { scroll: false });
     }
   };
   return (
