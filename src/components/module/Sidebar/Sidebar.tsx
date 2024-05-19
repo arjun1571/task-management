@@ -11,9 +11,14 @@ interface NavLink {
 
 const Sidebar: FunctionComponent = () => {
   const navLinkData: NavLink[] = [
-    { id: 1, name: "Projects Overview", link: "project-overview", icon: "" },
-    { id: 2, name: "Task Management", link: "task-management", icon: "" },
-    { id: 3, name: "Demo", link: "demo", icon: "" },
+    {
+      id: 1,
+      name: "Projects Overview",
+      link: "project-overview",
+      icon: "donut_small",
+    },
+    { id: 2, name: "Task Management", link: "task-management", icon: "task" },
+    { id: 3, name: "Demo", link: "demo", icon: "layers" },
   ];
 
   return (
@@ -30,7 +35,7 @@ const Sidebar: FunctionComponent = () => {
             key={navData.id}
             className="mt-10 flex items-center text-white mx-4"
           >
-            <Icon name="layers" />
+            <Icon name={navData?.icon} />
             <p className="ms-4">{navData?.name}</p>
           </Link>
         ))}
