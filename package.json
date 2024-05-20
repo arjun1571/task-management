@@ -11,6 +11,7 @@
   "dependencies": {
     "@hookform/resolvers": "^3.4.0",
     "@tanstack/react-query": "^5.37.1",
+    "@tanstack/react-query-devtools": "^5.37.1",
     "antd": "^5.17.3",
     "axios": "^1.6.8",
     "material-icons": "^1.13.12",
@@ -22,6 +23,7 @@
     "yup": "^1.4.0"
   },
   "devDependencies": {
+    "@tanstack/eslint-plugin-query": "^5.35.6",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
