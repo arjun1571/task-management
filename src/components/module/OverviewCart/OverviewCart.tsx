@@ -10,11 +10,12 @@ interface Props {
 }
 
 const OverviewCart: React.FC<Props> = ({ item, onView, onEdit, onDelete }) => {
+  console.log(item.id);
   return (
     <div className="border p-5 rounded-md flex justify-between bg-lime-300">
       <div>
         <h2 className="font-semibold text-lg">Name: {item.name}</h2>
-        <p className="font-semibold text-lg">Title: {item.email}</p>
+        <p className="font-semibold text-lg">Email: {item.email}</p>
       </div>
       <div className="flex items-center gap-3 font-semibold">
         <button
