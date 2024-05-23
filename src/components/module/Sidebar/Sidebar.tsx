@@ -14,11 +14,11 @@ const Sidebar: FunctionComponent = () => {
     {
       id: 1,
       name: "Projects Overview",
-      link: "project-overview",
+      link: "/project-overview",
       icon: "donut_small",
     },
-    { id: 2, name: "Task Management", link: "task-management", icon: "task" },
-    { id: 3, name: "Demo", link: "demo", icon: "layers" },
+    { id: 2, name: "Task Management", link: "/task-management", icon: "task" },
+    { id: 3, name: "Demo", link: "/demo", icon: "layers" },
   ];
 
   return (

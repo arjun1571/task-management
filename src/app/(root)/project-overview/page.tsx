@@ -1,16 +1,20 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
+import { useState } from "react";
 import Button from "@/src/components/core/Button/Button";
 import Icon from "@/src/components/core/Icon/Icon";
 import Input from "@/src/components/core/Input/Input";
 import OverviewCart from "@/src/components/module/OverviewCart/OverviewCart";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { createPost, deletePost } from "../../libs/task";
+import { useRouter } from "next/navigation";
+import Loading from "@/src/components/module/Loading/Loading";
 
 export interface IItem {
-  _id: any;
+  _id: string;
   id: number;
   name: string;
   username: string;
@@ -27,6 +31,11 @@ export interface IItem {
   };
 }
 
+interface IFormInput {
+  email: string;
+  name: string;
+}
+
 const schema = yup.object({
   email: yup
     .string()
@@ -34,14 +43,18 @@ const schema = yup.object({
     .required("Email is required")
     .transform((value: string) => (value ? value : null))
     .email("Invalid Email format")
-    .max(100, "Work Email must not exceed 100 digits")
+    .max(100, "Email must not exceed 100 characters")
     .matches(/^\S*$/, "Spaces are not allowed in the email"),
-  name: yup.string(),
+  name: yup.string().required("Name is required"),
 });
 
 const ProjectsOverview = () => {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const { data, isLoading, isError } = useQuery<any>({
-    queryKey: ["todos"],
+    queryKey: ["task"],
     queryFn: async () => {
       const response = await fetch("http://localhost:3000/api/task");
       if (!response.ok) {
@@ -51,43 +64,52 @@ const ProjectsOverview = () => {
     },
   });
 
-  console.log("kkkk", data);
-
   const {
     handleSubmit,
     register,
     formState: { errors },
-  } = useForm<any>({
+    reset,
+  } = useForm<IFormInput>({
     resolver: yupResolver(schema),
   });
 
-  const handleView = (id: number) => {
-    console.log("View project with id:", id);
-  };
-
-  const handleEdit = (id: number) => {
-    console.log("Edit project with id:", id);
-  };
+  const deletePostMutation = useMutation({
+    mutationFn: deletePost,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["task"]);
+    },
+  });
 
   const handleDelete = async (id: string) => {
-    console.log("id", id);
+    deletePostMutation.mutate(id);
+  };
 
-    try {
-      await axios.delete(`http://localhost:3000/api/task/${id}`);
-      console.log("Successfully deleted project with id:", id);
-      // await ProjectsOverview();
-    } catch (error) {
-      console.error("Error deleting project:", error);
+  const createPostMutation = useMutation({
+    mutationFn: createPost,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["task"]);
+    },
+  });
+
+  const formSubmit = async (data: IFormInput) => {
+    createPostMutation.mutate({ id: 3, ...data });
+    reset();
+    setIsModalOpen(false);
+  };
+
+  const handleView = (id: string) => {
+    router.push(`project-overview/${id}`, { scroll: false });
+  };
+
+  const handleEdit = (id: string) => {
+    console.log("Edit project with id:", id);
+    if (id) {
+      setIsModalOpen(true);
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Loading />;
   if (isError) return <div>404</div>;
-
-  const formSubmit = async (data: any) => {
-    console.log(data);
-    axios.post("http://localhost:3000/api/task/", data);
-  };
 
   return (
     <div>
@@ -97,59 +119,62 @@ const ProjectsOverview = () => {
           <Icon name="search" className="absolute right-3 top-8" />
         </div>
         <div>
-          <dialog id="my_modal_3" className="modal">
-            <div className="modal-box">
-              <form method="dialog">
-                {/* if there is a button in form, it will close the modal */}
-                <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-                  ✕
-                </button>
-              </form>
-              <div className="flex mx-auto">
-                <div>
-                  <h4 className="flex mx-auto">Add Task</h4>
-                  <form
-                    className="md:w-[400px] w-full"
-                    onSubmit={handleSubmit(formSubmit)}
+          {isModalOpen && (
+            <dialog className="modal bg-black bg-opacity-40 " open>
+              <div className="modal-box">
+                <form>
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                    onClick={() => setIsModalOpen(false)}
                   >
-                    <Input
-                      label="Name"
-                      placeholder="Enter Name"
-                      classNames="md:w-[400px] w-full"
-                      registerProperty={register("name")}
-                      errorText={errors.name?.message}
-                      leftHelpText={"name"}
-                      isRequired
-                      type="text"
-                      noMargin={true}
-                    />
-                    <Input
-                      label="Email"
-                      placeholder="Enter Email"
-                      classNames="md:w-[400px] w-full my-6"
-                      registerProperty={register("email")}
-                      errorText={errors.email?.message}
-                      leftHelpText={"checkbox"}
-                      isRequired
-                      type="text"
-                      noMargin={true}
-                    />
-
-                    <Button
-                      type="submit"
-                      className="px-6 py-3 mb-4 bg-primary-500 flex justify-center font-medium text-white w-full mt-8"
+                    ✕
+                  </button>
+                </form>
+                <div className="flex mx-auto">
+                  <div>
+                    <h4 className="flex mx-auto">Add Task</h4>
+                    <form
+                      className="md:w-[400px] w-full"
+                      onSubmit={handleSubmit(formSubmit)}
                     >
-                      Confirm
-                    </Button>
-                  </form>
+                      <Input
+                        label="Name"
+                        placeholder="Enter Name"
+                        classNames="md:w-[400px] w-full"
+                        registerProperty={register("name")}
+                        errorText={errors.name?.message}
+                        leftHelpText={"name"}
+                        isRequired
+                        type="text"
+                        noMargin={true}
+                      />
+                      <Input
+                        label="Email"
+                        placeholder="Enter Email"
+                        classNames="md:w-[400px] w-full my-6"
+                        registerProperty={register("email")}
+                        errorText={errors.email?.message}
+                        leftHelpText={"email"}
+                        isRequired
+                        type="email"
+                        noMargin={true}
+                      />
+                      <Button
+                        type="submit"
+                        className="px-6 py-3 mb-4 bg-primary-500 flex justify-center font-medium text-white w-full mt-8"
+                      >
+                        Confirm
+                      </Button>
+                    </form>
+                  </div>
                 </div>
               </div>
-            </div>
-          </dialog>
+            </dialog>
+          )}
           <Button
-            onClick={() => document.getElementById("my_modal_3").showModal()}
-            type="submit"
-            className="px-6 py-3 mb-4 bg-primary-500 flex justify-center font-medium text-white  mt-8"
+            onClick={() => setIsModalOpen(true)}
+            className="px-6 py-3 mb-4 bg-primary-500 flex justify-center font-medium text-white mt-8"
           >
             + Add New
           </Button>
@@ -161,7 +186,7 @@ const ProjectsOverview = () => {
             key={item._id}
             item={item}
             onView={() => handleView(item._id)}
-            onEdit={() => handleEdit(item.id)}
+            onEdit={() => handleEdit(item._id)}
             onDelete={() => handleDelete(item._id)}
           />
         ))}
