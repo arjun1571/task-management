@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 export interface IItem {
+  _id: any;
   id: number;
   name: string;
   username: string;
@@ -68,11 +69,13 @@ const ProjectsOverview = () => {
     console.log("Edit project with id:", id);
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
+    console.log("id", id);
+
     try {
       await axios.delete(`http://localhost:3000/api/task/${id}`);
       console.log("Successfully deleted project with id:", id);
-      await ProjectsOverview();
+      // await ProjectsOverview();
     } catch (error) {
       console.error("Error deleting project:", error);
     }
@@ -153,13 +156,13 @@ const ProjectsOverview = () => {
         </div>
       </div>
       <div className="grid grid-cols-2 gap-5">
-        {data?.tasks?.map((item: IItem) => (
+        {data?.task?.map((item: IItem) => (
           <OverviewCart
-            key={item.id}
+            key={item._id}
             item={item}
-            onView={() => handleView(item.id)}
+            onView={() => handleView(item._id)}
             onEdit={() => handleEdit(item.id)}
-            onDelete={() => handleDelete(item.id)}
+            onDelete={() => handleDelete(item._id)}
           />
         ))}
       </div>
