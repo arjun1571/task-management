@@ -78,7 +78,7 @@ const ProjectsOverview = () => {
   const deletePostMutation = useMutation({
     mutationFn: deletePost,
     onSuccess: () => {
-      queryClient.invalidateQueries(["task"]);
+      queryClient.invalidateQueries({ queryKey: ["task"] });
     },
   });
 
@@ -106,7 +106,7 @@ const ProjectsOverview = () => {
   const createPostMutation = useMutation({
     mutationFn: createPost,
     onSuccess: () => {
-      queryClient.invalidateQueries(["task"]);
+      queryClient.invalidateQueries({ queryKey: ["task"] });
     },
   });
 
