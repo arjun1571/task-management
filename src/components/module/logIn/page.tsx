@@ -5,6 +5,7 @@ import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/navigation";
+import { ToastService } from "@/src/@service/utils/toastr.service";
 
 const schema = yup.object({
   email: yup
@@ -32,9 +33,9 @@ export default function LogIn() {
   });
 
   const formSubmit = (data: any) => {
-    console.log(data);
     if (data) {
       router.push("/project-overview", { scroll: false });
+      ToastService.success("Login successful");
     }
   };
   return (

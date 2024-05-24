@@ -12,6 +12,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { createPost, deletePost } from "../../libs/task";
 import { useRouter } from "next/navigation";
 import Loading from "@/src/components/module/Loading/Loading";
+import Swal from "sweetalert2";
+import { ToastService } from "@/src/@service/utils/toastr.service";
 
 export interface IItem {
   _id: string;
@@ -81,7 +83,24 @@ const ProjectsOverview = () => {
   });
 
   const handleDelete = async (id: string) => {
-    deletePostMutation.mutate(id);
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deletePostMutation.mutate(id);
+        Swal.fire({
+          title: "Deleted!",
+          text: "Your file has been deleted.",
+          icon: "success",
+        });
+      }
+    });
   };
 
   const createPostMutation = useMutation({
@@ -92,7 +111,11 @@ const ProjectsOverview = () => {
   });
 
   const formSubmit = async (data: IFormInput) => {
-    createPostMutation.mutate({ id: 3, ...data });
+    if (data) {
+      createPostMutation.mutate({ id: 3, ...data });
+      ToastService.success("Task created successful");
+    }
+
     reset();
     setIsModalOpen(false);
   };
@@ -120,7 +143,7 @@ const ProjectsOverview = () => {
         </div>
         <div>
           {isModalOpen && (
-            <dialog className="modal bg-black bg-opacity-40 " open>
+            <dialog className="modal bg-black bg-opacity-40 w-full" open>
               <div className="modal-box">
                 <form>
                   <button
@@ -132,16 +155,13 @@ const ProjectsOverview = () => {
                   </button>
                 </form>
                 <div className="flex mx-auto">
-                  <div>
+                  <div className="w-full">
                     <h4 className="flex mx-auto">Add Task</h4>
-                    <form
-                      className="md:w-[400px] w-full"
-                      onSubmit={handleSubmit(formSubmit)}
-                    >
+                    <form className="my-10" onSubmit={handleSubmit(formSubmit)}>
                       <Input
                         label="Name"
                         placeholder="Enter Name"
-                        classNames="md:w-[400px] w-full"
+                        classNames=" w-full"
                         registerProperty={register("name")}
                         errorText={errors.name?.message}
                         leftHelpText={"name"}
@@ -152,7 +172,7 @@ const ProjectsOverview = () => {
                       <Input
                         label="Email"
                         placeholder="Enter Email"
-                        classNames="md:w-[400px] w-full my-6"
+                        classNames=" w-full my-6"
                         registerProperty={register("email")}
                         errorText={errors.email?.message}
                         leftHelpText={"email"}

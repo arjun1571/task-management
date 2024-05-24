@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import "material-icons/iconfont/material-icons.css";
 import QueryProvider from "../components/module/QueryProvider/QueryProvider";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastComponent } from "../components/core/ToastComponent/ToastComponent";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +22,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <QueryProvider>
-          <div>{children}</div>
+          <div>
+            <ToastComponent />
+            {children}
+          </div>
         </QueryProvider>
       </body>
     </html>
